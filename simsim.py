@@ -34,15 +34,15 @@ class AirModel(nn.Module):
         return x
 
 # App title
-st.title("Time Series Prediction with LSTM")
+st.title("Time Series Prediction with LSTM 🐶")
 
 # File uploader for CSV
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 # Model parameters
-lookback = st.sidebar.slider("Lookback", min_value=10, max_value=365, value=100)
-epochs = st.sidebar.slider("Epochs", min_value=100, max_value=5000, step=100, value=1000)
-batch_size = st.sidebar.slider("Batch size", min_value=4, max_value=32, value=8)
+lookback = st.sidebar.slider("Lookback", min_value=365, max_value=1095, value=730)
+epochs = st.sidebar.slider("Epochs", min_value=100, max_value=5000, step=100, value=2000)
+batch_size = st.sidebar.slider("Batch size", min_value=8, max_value=128, value=32)
 
 if uploaded_file is not None:
     # Load CSV
