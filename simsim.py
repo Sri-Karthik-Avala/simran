@@ -6,6 +6,8 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.utils.data as data
+import plotly.graph_objects as go
+from sklearn.metrics import mean_absolute_error
 
 # Function to create dataset for time series prediction
 def create_dataset(dataset, lookback):
@@ -38,7 +40,7 @@ st.title("Time Series Prediction with LSTM")
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 # Model parameters
-lookback = st.sidebar.slider("Lookback", min_value=10, max_value=365, value=10)
+lookback = st.sidebar.slider("Lookback", min_value=10, max_value=365, value=100)
 epochs = st.sidebar.slider("Epochs", min_value=100, max_value=5000, step=100, value=1000)
 batch_size = st.sidebar.slider("Batch size", min_value=4, max_value=32, value=8)
 
@@ -93,17 +95,24 @@ if uploaded_file is not None:
     # Prediction button
     if st.button("Predict"):
         with torch.no_grad():
+            train_pred = model(X_train)[:, -1, :].numpy()
+            test_pred = model(X_test)[:, -1, :].numpy()
+
             train_plot = np.ones_like(timeseries) * np.nan
-            train_plot[lookback:train_size] = model(X_train)[:, -1, :].numpy()
+            train_plot[lookback:train_size] = train_pred
 
             test_plot = np.ones_like(timeseries) * np.nan
-            test_plot[train_size+lookback:len(timeseries)] = model(X_test)[:, -1, :].numpy()
+            test_plot[train_size+lookback:len(timeseries)] = test_pred
 
-        # Plot results
-        fig, ax = plt.subplots()
-        ax.plot(timeseries, label='Original data')
-        ax.plot(train_plot, label='Train prediction', color='red')
-        ax.plot(test_plot, label='Test prediction', color='green')
-        ax.legend()
+            # Calculate MAE
+            test_actual = test[lookback:]
+            mae_score = mean_absolute_error(test_actual, test_pred)
+            st.write(f"Mean Absolute Error (MAE) on test set: {mae_score:.4f}")
 
-        st.pyplot(fig)
+            # Plot using Plotly
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(x=np.arange(len(timeseries)), y=timeseries.flatten(), mode='lines', name='Original data'))
+            fig.add_trace(go.Scatter(x=np.arange(len(timeseries)), y=train_plot.flatten(), mode='lines', name='Train prediction', line=dict(color='red')))
+            fig.add_trace(go.Scatter(x=np.arange(len(timeseries)), y=test_plot.flatten(), mode='lines', name='Test prediction', line=dict(color='green')))
+
+            st.plotly_chart(fig)
