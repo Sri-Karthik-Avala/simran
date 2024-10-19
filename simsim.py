@@ -35,7 +35,7 @@ st.title("Time Series Prediction with LSTM")
 uploaded_file = st.file_uploader("Upload your CSV file", type=["csv"])
 
 # Model parameters
-lookback = st.sidebar.slider("Lookback", min_value=500, max_value=1095, value=1095)
+lookback = st.sidebar.slider("Lookback", min_value=50, max_value=1095, value=1095)
 epochs = st.sidebar.slider("Epochs", min_value=100, max_value=5000, step=100, value=1000)
 batch_size = st.sidebar.slider("Batch size", min_value=4, max_value=32, value=8)
 
