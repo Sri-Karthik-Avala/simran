@@ -50,7 +50,7 @@ if uploaded_file is not None:
     st.write("Data preview:", df.head())
     
     # Extract time series data
-    timeseries = df[["Amount Net Sales"]].values.astype('float32')
+    timeseries = df[["AmtNet Sales USD"]].values.astype('float32')
 
     # Train-test split
     train_size = int(len(timeseries) * 0.67)
